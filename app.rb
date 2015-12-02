@@ -1,6 +1,5 @@
 require 'json'
 require 'openssl'
-require 'sinatra/base'
 require 'sinatra/config_file'
 
 require_relative 'jobs/codeship_checker_job'
