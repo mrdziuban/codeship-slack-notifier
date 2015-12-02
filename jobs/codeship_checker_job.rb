@@ -47,29 +47,33 @@ class CodeshipCheckerJob
     JSON.parse(open("https://codeship.com/api/v1/projects/#{@settings.codeship['project_id']}.json?api_key=#{@settings.codeship['api_key']}").read)['builds']
   end
 
+  def status_text(status)
+    case status
+    when 'testing'
+      'is pending'
+    when 'success'
+      'succeeded'
+    when 'error'
+      'FAILED'
+    when 'stopped'
+      'was stopped'
+    when 'waiting'
+      'is waiting to start'
+    when 'infrastructure_failure'
+      'FAILED due to a Codeship error'
+    when 'ignored'
+      'was ignored because the account is over the monthly build limit'
+    when 'blocked'
+      'was blocked because of excessive resource consumption'
+    else
+      'did something weird...'
+    end
+  end
+
   def build_message(build)
     build_url = "https://codeship.com/projects/#{@settings.codeship['project_id']}/builds/#{build['id']}"
-    status_text = case build['status']
-                  when 'testing'
-                    'is pending'
-                  when 'success'
-                    'succeeded'
-                  when 'error'
-                    'FAILED'
-                  when 'stopped'
-                    'was stopped'
-                  when 'waiting'
-                    'is waiting to start'
-                  when 'infrastructure_failure'
-                    'FAILED due to a Codeship error'
-                  when 'ignored'
-                    'was ignored because the account is over the monthly build limit'
-                  when 'blocked'
-                    'was blocked because of excessive resource consumption'
-                  else
-                    'did something weird...'
-                  end
-    "<#{build_url}|#{build['branch']} build>#{build['github_username'] ? " by #{build['github_username']}" : ''} #{status_text}"
+    username = build['github_username'] ? " by #{build['github_username']}" : ''
+    "<#{build_url}|#{build['branch']} build>#{username} #{status_text(build['status'])}"
   end
 
   def notify_slack(build, message = false)
