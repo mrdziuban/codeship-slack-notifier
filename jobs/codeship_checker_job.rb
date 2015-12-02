@@ -49,6 +49,8 @@ class CodeshipCheckerJob
                     'FAILED'
                   when 'stopped'
                     'was stopped'
+                  when 'infrastructure_failure'
+                    'FAILED due to a Codeship error'
                   else
                     'did something weird...'
                   end
