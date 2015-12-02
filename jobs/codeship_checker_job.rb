@@ -31,7 +31,7 @@ class CodeshipCheckerJob
         notify_slack(build) unless waiting_notified
         waiting_notified = true
         sleep 10
-      elsif ['success', 'error'].include?(build['status'])
+      elsif finished_statuses.include?(build['status'])
         return notify_slack(build)
       end
 
@@ -45,6 +45,10 @@ class CodeshipCheckerJob
 
   def builds
     JSON.parse(open("https://codeship.com/api/v1/projects/#{@settings.codeship['project_id']}.json?api_key=#{@settings.codeship['api_key']}").read)['builds']
+  end
+
+  def finished_statuses
+    %w(success error stopped ignored blocked infrastructure_failure)
   end
 
   def status_text(status)
