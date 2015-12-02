@@ -14,7 +14,7 @@ class CodeshipCheckerJob
     attempted_build_finds = 0
     times_looped = 0
     loop do
-      build = builds.find {|b| b['commit_id'] = @git_commit}
+      build = builds.find {|b| b['commit_id'] == @git_commit}
       unless build
         return if attempted_build_finds > 5
         attempted_build_finds += 1
@@ -49,7 +49,7 @@ class CodeshipCheckerJob
                   when 'error'
                     'FAILED'
                   end
-    "<#{build_url}|#{build['branch']} build> by #{build['github_username']} #{status_text}"
+    "<#{build_url}|#{build['branch']} build>#{build['github_username'] ? " by #{build['github_username']}" : ''} #{status_text}"
   end
 
   def notify_slack(build)
@@ -57,6 +57,6 @@ class CodeshipCheckerJob
       webhook_url: @settings.slack['webhook_url'],
       username: @settings.slack['username']
     )
-    Slack::Post.post(build_message(build), channel)
+    Slack::Post.post(build_message(build), @settings.slack['channel'])
   end
 end
