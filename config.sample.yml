@@ -1,5 +1,6 @@
 branches_to_handle:
   - master
+  - develop
 github:
   post_secret: GITHUB_POST_SECRET
 codeship:
