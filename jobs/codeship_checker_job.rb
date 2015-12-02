@@ -22,6 +22,7 @@ class CodeshipCheckerJob
         next
       end
 
+      started_monitoring = Time.now.to_i
       if build['status'] == 'testing'
         notify_slack(build) unless testing_notified
         testing_notified = true
@@ -31,8 +32,11 @@ class CodeshipCheckerJob
         waiting_notified = true
         sleep 10
       elsif ['success', 'error'].include?(build['status'])
-        notify_slack(build)
-        break
+        return notify_slack(build)
+      end
+
+      if Time.now.to_i - started_monitoring > (settings.codeship['wait_timeout'] || 1500).to_i
+        return notify_slack({}, 'Wait timeout of 1500 seconds exceeded')
       end
     end
   end
@@ -68,11 +72,11 @@ class CodeshipCheckerJob
     "<#{build_url}|#{build['branch']} build>#{build['github_username'] ? " by #{build['github_username']}" : ''} #{status_text}"
   end
 
-  def notify_slack(build)
+  def notify_slack(build, message = false)
     Slack::Post.configure(
       webhook_url: @settings.slack['webhook_url'],
       username: @settings.slack['username']
     )
-    Slack::Post.post(build_message(build), @settings.slack['channel'])
+    Slack::Post.post(message || build_message(build), @settings.slack['channel'])
   end
 end
