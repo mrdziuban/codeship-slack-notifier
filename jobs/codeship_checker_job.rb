@@ -11,7 +11,8 @@ class CodeshipCheckerJob
     @git_commit = git_commit
 
     attempted_build_finds = 0
-    times_looped = 0
+    testing_notified = false
+    waiting_notified = false
     loop do
       build = builds.find {|b| b['commit_id'] == @git_commit}
       unless build
@@ -22,8 +23,12 @@ class CodeshipCheckerJob
       end
 
       if build['status'] == 'testing'
-        notify_slack(build) if times_looped == 0
-        times_looped += 1
+        notify_slack(build) unless testing_notified
+        testing_notified = true
+        sleep 10
+      elsif build['status'] == 'waiting'
+        notify_slack(build) unless waiting_notified
+        waiting_notified = true
         sleep 10
       elsif ['success', 'error'].include?(build['status'])
         notify_slack(build)
@@ -49,8 +54,14 @@ class CodeshipCheckerJob
                     'FAILED'
                   when 'stopped'
                     'was stopped'
+                  when 'waiting'
+                    'is waiting to start'
                   when 'infrastructure_failure'
                     'FAILED due to a Codeship error'
+                  when 'ignored'
+                    'was ignored because the account is over the monthly build limit'
+                  when 'blocked'
+                    'was blocked because of excessive resource consumption'
                   else
                     'did something weird...'
                   end
