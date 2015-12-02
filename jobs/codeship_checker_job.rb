@@ -47,6 +47,10 @@ class CodeshipCheckerJob
                     'succeeded'
                   when 'error'
                     'FAILED'
+                  when 'stopped'
+                    'was stopped'
+                  else
+                    'did something weird...'
                   end
     "<#{build_url}|#{build['branch']} build>#{build['github_username'] ? " by #{build['github_username']}" : ''} #{status_text}"
   end
