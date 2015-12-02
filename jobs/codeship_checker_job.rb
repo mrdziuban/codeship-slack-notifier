@@ -77,7 +77,7 @@ class CodeshipCheckerJob
   def build_message(build)
     build_url = "https://codeship.com/projects/#{@settings.codeship['project_id']}/builds/#{build['id']}"
     username = build['github_username'] ? " by #{build['github_username']}" : ''
-    "<#{build_url}|#{build['branch']} build>#{username} #{status_text(build['status'])}"
+    "<#{build_url}|#{build['branch']}> build#{username} #{status_text(build['status'])}"
   end
 
   def notify_slack(build, message = false)
