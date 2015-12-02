@@ -27,8 +27,8 @@ github:
 codeship:
   api_key: CODESHIP_API_KEY        # Your Codeship API key
   project_id: 12345                # Your Codeship project's ID
-  attempted_build_finds: 5         # Times to check Codeship to see if the build exists--OPTIONAL, defaults to 5
-  wait_timeout: 1500               # Max seconds to wait for the Codeship build to finish--OPTIONAL, defaults to 1500
+  attempted_build_finds: 5         # OPTIONAL: Times to check Codeship to see if the build exists, defaults to 5
+  wait_timeout: 1500               # OPTIONAL: Max seconds to wait for the Codeship build to finish, defaults to 1500
 slack:
   webhook_url: SLACK_WEBHOOK_URL   # Your Slack webhook URL
   username: SLACK_USERNAME         # The Slack username you want the notifications to post from
