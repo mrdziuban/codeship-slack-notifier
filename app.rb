@@ -35,7 +35,7 @@ class CodeshipSlackNotifier < Sinatra::Base
     parse_body
     halt 401 unless authorize_request
     halt 204 unless @body['ref'] && settings.branches_to_handle.include?(@body['ref'].split('/').last)
-    CodeshipCheckerJob.new.async.perform(settings.codeship['api_key'], @body['head'])
+    CodeshipCheckerJob.new.async.perform(settings, @body['head'])
   end
 
   public

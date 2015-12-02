@@ -11,11 +11,6 @@ class CodeshipCheckerJob
     @settings = settings
     @git_commit = git_commit
 
-    until @relevant_build_id
-      find_build
-      sleep 3
-    end
-
     attempted_build_finds = 0
     times_looped = 0
     loop do
@@ -54,7 +49,7 @@ class CodeshipCheckerJob
                   when 'error'
                     'FAILED'
                   end
-    "<#{build_url}|#{build['branch']} build> #{status_text}"
+    "<#{build_url}|#{build['branch']} build> by #{build['github_username']} #{status_text}"
   end
 
   def notify_slack(build)
