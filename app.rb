@@ -2,7 +2,6 @@ require 'json'
 require 'openssl'
 require 'sinatra'
 require 'sinatra/config_file'
-require 'pry'
 
 require_relative 'jobs/codeship_checker_job'
 

@@ -2,7 +2,6 @@ require 'json'
 require 'open-uri'
 require 'slack/post'
 require 'sucker_punch'
-require 'pry'
 
 class CodeshipCheckerJob
   include SuckerPunch::Job
