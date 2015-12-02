@@ -6,7 +6,7 @@ require_relative 'jobs/codeship_checker_job'
 
 class CodeshipSlackNotifier < Sinatra::Base
   set :server, :puma
-  set :port, 9876
+  set :port, (ENV['PORT'] || 9876).to_i
 
   register Sinatra::ConfigFile
   config_file 'config.yml'
