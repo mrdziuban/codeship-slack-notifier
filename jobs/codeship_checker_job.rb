@@ -16,7 +16,7 @@ class CodeshipCheckerJob
     loop do
       build = builds.find {|b| b['commit_id'] == @git_commit}
       unless build
-        return if attempted_build_finds > 5
+        return if attempted_build_finds > (settings.codeship['attempted_build_finds'] || 5).to_i
         attempted_build_finds += 1
         sleep 3
         next
