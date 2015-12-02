@@ -6,7 +6,7 @@ codeship:
   api_key: CODESHIP_API_KEY
   project_id: 12345
   attempted_build_finds: 5  # optional -- defaults to 5
-  wait_timeout: 1500        # optionsl -- defaults to 1500
+  wait_timeout: 1500        # optional -- defaults to 1500
 slack:
   webhook_url: SLACK_WEBHOOK_URL
   username: SLACK_USERNAME
