@@ -23,15 +23,16 @@ class CodeshipCheckerJob
       end
 
       started_monitoring = Time.now.to_i
-      if build['status'] == 'testing'
+      case build['status']
+      when 'testing'
         notify_slack(build) unless testing_notified
         testing_notified = true
         sleep 10
-      elsif build['status'] == 'waiting'
+      when 'waiting'
         notify_slack(build) unless waiting_notified
         waiting_notified = true
         sleep 10
-      elsif finished_statuses.include?(build['status'])
+      when *finished_statuses
         return notify_slack(build)
       end
 
