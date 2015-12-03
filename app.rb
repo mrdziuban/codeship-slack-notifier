@@ -7,6 +7,7 @@ require_relative 'jobs/codeship_checker_job'
 class CodeshipSlackNotifier < Sinatra::Base
   set :server, :puma
   set :port, (ENV['PORT'] || 9876).to_i
+  set :bind, '0.0.0.0'
 
   register Sinatra::ConfigFile
   config_file 'config.yml'
@@ -32,9 +33,9 @@ class CodeshipSlackNotifier < Sinatra::Base
   def handle_webhook
     parse_body
     halt 401 unless authorize_request
-    halt 422 unless @body['ref'] && @body['head']
+    halt 422 unless @body['ref'] && @body['head_commit'] && @body['head_commit']['id']
     halt 204 unless settings.branches_to_handle.include?(@body['ref'].split('/').last) || settings.branches_to_handle.include?('all')
-    CodeshipCheckerJob.new.async.perform(settings, @body['head'])
+    CodeshipCheckerJob.new.async.perform(settings, @body['head_commit']['id'])
   end
 
   public
