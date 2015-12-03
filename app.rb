@@ -22,7 +22,6 @@ class CodeshipSlackNotifier < Sinatra::Base
   def authorize_request
     signature = env['HTTP_X_HUB_SIGNATURE']
     secret = signature[5..-1]
-    binding.pry
     return false unless secret && settings.github['post_secret']
     digest = OpenSSL::Digest.new('sha1')
     body = request.body.read
