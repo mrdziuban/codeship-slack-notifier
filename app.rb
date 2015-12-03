@@ -1,4 +1,5 @@
 require 'json'
+require 'logger'
 require 'openssl'
 require 'sinatra/config_file'
 
@@ -11,6 +12,20 @@ class CodeshipSlackNotifier < Sinatra::Base
 
   register Sinatra::ConfigFile
   config_file 'config.yml'
+
+  Logger.class_eval { alias :write :'<<' }
+  access_log = File.open(File.join(settings.root, 'log', "#{settings.environment}_access.log"), 'a+')
+  access_log.sync = true
+  access_logger = Logger.new(access_log)
+  error_log = File.open(File.join(settings.root, 'log', "#{settings.environment}_error.log"), 'a+')
+  error_log.sync = true
+
+  configure do
+    enable :logging
+    use Rack::CommonLogger, access_logger
+  end
+
+  before { env['rack.errors'] = error_log }
 
   private
 
