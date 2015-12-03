@@ -33,7 +33,8 @@ class CodeshipSlackNotifier < Sinatra::Base
   def handle_webhook
     parse_body
     halt 401 unless authorize_request
-    halt 204 unless @body['ref'] && settings.branches_to_handle.include?(@body['ref'].split('/').last)
+    halt 422 unless @body['ref'] && @body['head']
+    halt 204 unless settings.branches_to_handle.include?(@body['ref'].split('/').last) || settings.branches_to_handle.include?('all')
     CodeshipCheckerJob.new.async.perform(settings, @body['head'])
   end
 

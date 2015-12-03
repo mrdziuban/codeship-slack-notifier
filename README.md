@@ -22,6 +22,7 @@ These are the options that you can/should specify in `config.yml`:
 branches_to_handle:                # The branches that you want Codeship notifications for
   - master
   - develop
+  - all                            # Specify 'all' if you want to be notified for all branches
 github:
   post_secret: GITHUB_POST_SECRET  # The POST secret you set up in your GitHub webhook
 codeship:
