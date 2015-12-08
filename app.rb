@@ -68,7 +68,7 @@ class CodeshipSlackNotifier < Sinatra::Base
     build = @body['build']
     message = "<#{build['build_url']}|#{build['branch']}> build"
     message += " (<#{build['commit_url']}|#{build['commit_id'][0..6]}>) " if build['commit_id'] && build['commit_url']
-    message += " by #{build['committer']} " if build['committer']
+    message += "#{message[-1] == ' ' ? '' : ' '}by #{build['committer']} " if build['committer']
     message += status_text(build['status'])
     message
   end
