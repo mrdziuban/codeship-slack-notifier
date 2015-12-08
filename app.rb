@@ -1,9 +1,8 @@
 require 'json'
 require 'logger'
 require 'openssl'
+require 'slack/post'
 require 'sinatra/config_file'
-
-require_relative 'jobs/codeship_checker_job'
 
 class CodeshipSlackNotifier < Sinatra::Base
   set :server, :puma
@@ -35,22 +34,52 @@ class CodeshipSlackNotifier < Sinatra::Base
     request.body.rewind
   end
 
-  def authorize_request
-    signature = env['HTTP_X_HUB_SIGNATURE']
-    secret = signature[5..-1]
-    return false unless secret && settings.github['post_secret']
-    digest = OpenSSL::Digest.new('sha1')
-    body = request.body.read
-    request.body.rewind
-    secret == OpenSSL::HMAC.hexdigest(digest, settings.github['post_secret'], body)
-  end
-
   def handle_webhook
     parse_body
-    halt 401 unless authorize_request
-    halt 422 unless @body['ref'] && @body['head_commit'] && @body['head_commit']['id']
-    halt 204 unless settings.branches_to_handle.include?(@body['ref'].split('/').last) || settings.branches_to_handle.include?('all')
-    CodeshipCheckerJob.new.async.perform(settings, @body['head_commit']['id'])
+    halt 422 unless @body['build']
+    halt 204 unless settings.branches_to_handle.include?(@body['build']['branch']) || settings.branches_to_handle.include?('all')
+    notify_slack
+  end
+
+  def status_text(status)
+    case status
+    when 'testing'
+      'is pending'
+    when 'success'
+      'succeeded'
+    when 'error'
+      'FAILED'
+    when 'stopped'
+      'was stopped'
+    when 'waiting'
+      'is waiting to start'
+    when 'infrastructure_failure'
+      'FAILED due to a Codeship error'
+    when 'ignored'
+      'was ignored because the account is over the monthly build limit'
+    when 'blocked'
+      'was blocked because of excessive resource consumption'
+    else
+      'did something weird...'
+    end
+  end
+
+  def build_message
+    build = @body['build']
+    message = "<#{build['build_url']}|#{build['branch']}> build"
+    message += " by #{build['committer']}" if build['committer']
+    message += " (<#{build['commit_url']}|#{build['commit_id'][0..6]}>)" if build['commit_id'] && build['commit_url']
+    message += status_text(build['status'])
+    message
+  end
+
+  def notify_slack(message = false)
+    Slack::Post.configure(
+      webhook_url: settings.slack['webhook_url'],
+      username: settings.slack['username']
+    )
+    message = message || build_message
+    Slack::Post.post(message, settings.slack['channel'])
   end
 
   public
