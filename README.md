@@ -1,6 +1,6 @@
 # Codeship Slack Notifier
 
-This is a simple Ruby web app that notifies your Slack channel with the status of your Codeship builds. It works by receiving GitHub webhooks for push events and doing background processing to monitor the status of your Codeship builds.
+This is a simple Ruby web app that notifies your Slack channel with the status of your Codeship builds. It works by receiving Codeship webhooks and forwarding on the message to Slack.
 
 The main difference between this and Codeship's official Slack integration is the ability to specify which GitHub branches you want monitored. For example, you might only want notifications about builds for your `master` branch.
 
