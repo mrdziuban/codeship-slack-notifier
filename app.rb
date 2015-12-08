@@ -73,12 +73,12 @@ class CodeshipSlackNotifier < Sinatra::Base
     message
   end
 
-  def notify_slack(message = false)
+  def notify_slack
     Slack::Post.configure(
       webhook_url: settings.slack['webhook_url'],
       username: settings.slack['username']
     )
-    Slack::Post.post(message || build_message, settings.slack['channel'])
+    Slack::Post.post(build_message, settings.slack['channel'])
   end
 
   public
