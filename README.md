@@ -19,14 +19,22 @@ The main difference between this and Codeship's official Slack integration is th
 These are the options that you can/should specify in `config.yml`:
 
 ```yml
-branches_to_handle:                # The branches that you want Codeship notifications for
-  - master
-  - develop
-  - all                            # Specify 'all' if you want to be notified for all branches
-slack:
-  webhook_url: SLACK_WEBHOOK_URL   # Your Slack webhook URL
-  username: SLACK_USERNAME         # The Slack username you want the notifications to post from
-  channel: SLACK_CHANNEL           # The Slack channel you want the notifications to post to
+slack:                                 # Global Slack settings
+  webhook_url: SLACK_WEBHOOK_URL       # Your Slack webhook URL
+  username: SLACK_USERNAME             # The Slack username you want the notifications to post from
+  channel: NOTIFICATIONS               # The Slack channel you want the notifications to post to
+  channel-testing: null                # Suppress alerts for the "testing" state
+
+branches_to_handle:                    # The branches that you want Codeship notifications for
+  master:                              # Default settings can be overridden per-branch
+    channel: [ ALERTS, NOTIFICATIONS ] # Multiple channels are okay
+    channel-success: NOTIFICATIONS     # Note that "channel-testing: null" is still implied here
+  develop: null                        # Set to null to use default settings for this branch
+  all: null                            # Specify 'all: null' if you want to be notified for all branches
+
+# branches_to_handle:                  # If you don't want branch-specific settings an array is okay
+# - master
+# - develop
 ```
 
 If you want to run this app on a port other than 9876, specify the `PORT` variable when starting the app

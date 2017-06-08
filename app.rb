@@ -74,11 +74,25 @@ class CodeshipSlackNotifier < Sinatra::Base
   end
 
   def notify_slack
+    build = @body['build']
+    if Array === settings.branches_to_handle
+      branch_settings = settings.slack
+    else
+      branch_settings = settings.slack.to_h.merge settings.branches_to_handle[build['branch']].to_h
+    end
     Slack::Post.configure(
-      webhook_url: settings.slack['webhook_url'],
-      username: settings.slack['username']
+      webhook_url: branch_settings['webhook_url'],
+      username: branch_settings['username']
     )
-    Slack::Post.post(build_message, settings.slack['channel'])
+
+    begin
+      channels = branch_settings.fetch("channel-#{build['status']}")
+    rescue KeyError
+      channels = branch_settings['channel']
+    end
+    [*channels].compact.each do |channel|
+      Slack::Post.post(build_message, channel)
+    end
   end
 
   public
