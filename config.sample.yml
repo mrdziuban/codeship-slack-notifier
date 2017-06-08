@@ -1,7 +1,12 @@
-branches_to_handle:
-  - master
-  - develop
-slack:
-  webhook_url: SLACK_WEBHOOK_URL
-  username: SLACK_USERNAME
-  channel: SLACK_CHANNEL
+slack:                                 # Global Slack settings
+  webhook_url: SLACK_WEBHOOK_URL       # Your Slack webhook URL
+  username: SLACK_USERNAME             # The Slack username you want the notifications to post from
+  channel: NOTIFICATIONS               # The Slack channel you want the notifications to post to
+  channel-pending: null                # Suppress alerts for the "pending" state
+
+branches_to_handle:                    # The branches that you want Codeship notifications for
+  master:                              # Default settings can be overridden per-branch
+    channel: [ ALERTS, NOTIFICATIONS ] # Multiple channels are okay
+    channel-success: NOTIFICATIONS     # Note that "channel-pending: null" is still implied here
+  develop: null                        # Set to null to use default settings for this branch
+  all: null                            # Specify 'all: null' if you want to be notified for all branches
